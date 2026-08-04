@@ -24,10 +24,10 @@ class DAQMock:
         self.duration = duration
         
     def configure(self):
-        print("Mock DAQ configured.")
+        print("mock daq configured.")
         
     def wait_for_trigger_and_read(self) -> np.ndarray:
-        print("Mock DAQ triggered. Generating synthetic wave...")
+        print("mock daq triggered. generating synthetic wave...")
         time.sleep(0.1) # Simulate acquisition time
         # Return a synthetic tap wave
         wave, _ = generate_tap_waveform(
@@ -97,17 +97,17 @@ class DAQHardware:
 def check_signal_quality(waveform: np.ndarray, max_val: float = 5.0) -> bool:
     """Quality checks: clipping, flat-line, SNR."""
     if np.all(waveform == waveform[0]):
-        print("ERROR: Flat-line detected in signal.")
+        print("error: flat-line detected in signal.")
         return False
         
     if np.max(np.abs(waveform)) >= (max_val - 0.05):
-        print("ERROR: Clipping detected.")
+        print("error: clipping detected.")
         return False
         
     rms = np.sqrt(np.mean(waveform**2))
     peak = np.max(np.abs(waveform))
     if peak / rms < 2.0: # Very low crest factor means it might be mostly noise
-        print("ERROR: Low SNR detected (mostly noise).")
+        print("error: low snr detected (mostly noise).")
         return False
         
     return True
@@ -163,7 +163,7 @@ def run_session(config: Dict[str, Any], mock: bool = False):
                 
                 for force in forces:
                     for rep in range(reps):
-                        print(f"Recording {sample} | Pos: {pos} | Force: {force} | Rep: {rep+1}/{reps}")
+                        print(f"recording {sample} | pos: {pos} | force: {force} | rep: {rep+1}/{reps}")
                         
                         meta = {
                             "sample_id": sample,
@@ -184,7 +184,7 @@ def run_session(config: Dict[str, Any], mock: bool = False):
                         
                         time.sleep(0.5) # Inter-tap interval
     except KeyboardInterrupt:
-        print("\nSession aborted by user.")
+        print("\nsession aborted by user.")
     finally:
         if not mock:
             daq.close()
@@ -193,7 +193,7 @@ def run_session(config: Dict[str, Any], mock: bool = False):
         if records:
             df = pd.DataFrame(records)
             df.to_csv(os.path.join(out_dir, "metadata_session.csv"), index=False)
-            print(f"Saved {len(records)} records.")
+            print(f"saved {len(records)} records.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

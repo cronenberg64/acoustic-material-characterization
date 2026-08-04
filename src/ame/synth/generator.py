@@ -195,7 +195,7 @@ def generate_dataset(
                     
     df = pd.DataFrame(records)
     df.to_csv(os.path.join(output_dir, "metadata.csv"), index=False)
-    print(f"Generated {len(df)} records in {output_dir}")
+    print(f"generated {len(df)} records in {output_dir}")
 
 def preview():
     wave, freqs = generate_tap_waveform(3.5e9, 1240.0, 0.1, 2, 1, 0.0)
@@ -217,7 +217,7 @@ def preview():
     plt.tight_layout()
     plt.show()
     
-    print("Underlying Physical Modal Frequencies:", freqs)
+    print("underlying physical modal frequencies:", freqs)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

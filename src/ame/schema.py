@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 class TapRecord(BaseModel):
@@ -27,7 +27,23 @@ class TapRecord(BaseModel):
     sample_rate_hz: int = Field(..., description="Sample rate of the recording in Hz", gt=0)
     
     # Ground Truth Properties
-    density_kgm3: float | None = Field(None, description="Measured density in kg/m^3")
+    density_kgm3: Optional[float] = None
     density_err_kgm3: float | None = Field(None, description="Uncertainty of the density measurement")
-    youngs_modulus_pa: float | None = Field(None, description="Measured Young's Modulus in Pa")
+    youngs_modulus_pa: Optional[float] = None
     youngs_err_pa: float | None = Field(None, description="Uncertainty of the Young's Modulus measurement")
+
+class ExternalAudioRecord(BaseModel):
+    """
+    Lightweight schema for externally-sourced audio (e.g., RealImpact).
+    Kept strictly separated from experimental rig measurements to prevent contamination.
+    """
+    uid: str
+    source_dataset: str
+    material: str
+    audio_path: str
+    sample_rate_hz: int
+    
+    # RealImpact specific metadata (Optional, depending on dataset)
+    object_id: Optional[str] = None
+    contact_force_profile: Optional[list] = None
+    impact_location: Optional[str] = None

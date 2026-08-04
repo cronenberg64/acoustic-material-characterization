@@ -13,20 +13,20 @@ def run_calibration_sweep(esp_port: str = '/dev/ttyUSB0', baud: int = 115200,
     if pulse_widths_us is None:
         pulse_widths_us = list(range(1000, 10001, 1000))
         
-    print(f"Connecting to ESP32 on {esp_port}...")
+    print(f"connecting to esp32 on {esp_port}...")
     try:
         esp = serial.Serial(esp_port, baud, timeout=2)
         time.sleep(2) # wait for reset
     except Exception as e:
-        print(f"Failed to connect: {e}")
-        print("Running in MOCK mode. Results will be synthetic.")
+        print(f"failed to connect: {e}")
+        print("running in mock mode. results will be synthetic.")
         esp = None
         
     results = []
     
     for pw in pulse_widths_us:
         for rep in range(reps):
-            print(f"Testing Pulse Width: {pw} us | Rep {rep+1}/{reps}")
+            print(f"testing pulse width: {pw} us | rep {rep+1}/{reps}")
             
             if esp:
                 esp.write(f"SET_PW {pw}\n".encode())
@@ -59,16 +59,16 @@ def run_calibration_sweep(esp_port: str = '/dev/ttyUSB0', baud: int = 115200,
     
     # Calculate means
     means = df.groupby("pulse_width_us")["measured_force_N"].mean().reset_index()
-    print("\nCalibration Summary:")
+    print("\ncalibration summary:")
     print(means)
     
     # Simple interpolation to find 5N, 10N, 15N
     target_forces = [5.0, 10.0, 15.0]
-    print("\nRecommended Pulse Widths:")
+    print("\nrecommended pulse widths:")
     for target in target_forces:
         # linear interpolation
         pw_interp = np.interp(target, means["measured_force_N"], means["pulse_width_us"]) if esp is None else 0 # Mock
-        print(f"Target Force: {target} N -> Pulse Width: ~{int(pw_interp)} us")
+        print(f"target force: {target} n -> pulse width: ~{int(pw_interp)} us")
         
     if esp:
         esp.close()
