@@ -1,106 +1,137 @@
-import json
-import os
-import argparse
-import numpy as np
 import pandas as pd
-from scipy.stats import linregress
+import numpy as np
+import scipy.stats as stats
+import os
+import glob
+from pathlib import Path
 
-def calculate_density(mass_kg: float, l_m: float, w_m: float, t_m: float) -> float:
-    """Calculates density from mass and bounding box dimensions."""
-    volume = l_m * w_m * t_m
-    return mass_kg / volume
+def calculate_density(mass, mass_err, length, len_err, width, wid_err, thickness, thick_err):
+    """
+    Calculate density and propagate uncertainty.
+    Inputs in g and mm. Output in kg/m^3.
+    """
+    # Convert to kg and m
+    m = mass / 1000.0
+    m_err = mass_err / 1000.0
+    l = length / 1000.0
+    l_err = len_err / 1000.0
+    w = width / 1000.0
+    w_err = wid_err / 1000.0
+    t = thickness / 1000.0
+    t_err = thick_err / 1000.0
+    
+    volume = l * w * t
+    density = m / volume
+    
+    # Fractional uncertainties (quadrature)
+    frac_err_m = m_err / m
+    frac_err_l = l_err / l
+    frac_err_w = w_err / w
+    frac_err_t = t_err / t
+    
+    frac_err_vol = np.sqrt(frac_err_l**2 + frac_err_w**2 + frac_err_t**2)
+    frac_err_density = np.sqrt(frac_err_m**2 + frac_err_vol**2)
+    
+    density_err = density * frac_err_density
+    return density, density_err
 
-def calculate_youngs_modulus(forces_N: list, deflections_m: list, L_span_m: float, w_m: float, t_m: float) -> tuple:
+def calculate_youngs_modulus(bend_df, width_mm, thickness_mm, span_mm=80.0):
     """
-    Calculates Young's Modulus using a 3-point bend test.
-    E = (k * L^3) / (48 * I) where I = (w * t^3) / 12
-    Returns (E_Pa, r_squared)
+    Calculate Young's Modulus using 3-point bend data.
+    E = (F * L^3) / (48 * delta * I)
     """
-    if len(forces_N) < 2:
-        return np.nan, 0.0
-        
-    # Find slope k = dF/d_deflection in the elastic region
-    slope, intercept, r_value, p_value, std_err = linregress(deflections_m, forces_N)
+    force_n = bend_df['Force_N'].values
+    deflection_mm = bend_df['Deflection_mm'].values
+    deflection_m = deflection_mm / 1000.0
+    
+    # Linear regression to find stiffness k = F / delta
+    res = stats.linregress(deflection_m, force_n)
+    k = res.slope
+    r_squared = res.rvalue**2
+    
+    # Geometric properties in m
+    b = width_mm / 1000.0
+    h = thickness_mm / 1000.0
+    L = span_mm / 1000.0
     
     # Area moment of inertia
-    I = (w_m * (t_m ** 3)) / 12.0
+    I = (b * h**3) / 12.0
     
-    # Young's modulus
-    E_Pa = (slope * (L_span_m ** 3)) / (48 * I)
+    # Young's Modulus (Pa)
+    E = (k * L**3) / (48 * I)
     
-    return E_Pa, (r_value ** 2)
+    # Convert to GPa for readability
+    E_gpa = E / 1e9
+    
+    return E, E_gpa, r_squared
 
-def predict_first_bending_mode(E_Pa: float, rho_kgm3: float, L_m: float, w_m: float, t_m: float) -> float:
+def predict_first_bending_mode(E_pa, density_kg_m3, length_mm, width_mm, thickness_mm):
     """
-    Predicts the first free-free bending mode frequency using Euler-Bernoulli beam theory.
+    Predict the first free-free bending mode frequency (Hz).
+    Using Euler-Bernoulli beam theory: f1 = (22.373 / (2*pi*L^2)) * sqrt(E*I / (rho*A))
     """
-    A = w_m * t_m
-    I = (w_m * (t_m ** 3)) / 12.0
+    L = length_mm / 1000.0
+    b = width_mm / 1000.0
+    h = thickness_mm / 1000.0
     
-    # 22.3733 is roughly 4.73004^2
-    f1 = (22.3733 / (2 * np.pi * (L_m ** 2))) * np.sqrt((E_Pa * I) / (rho_kgm3 * A))
+    I = (b * h**3) / 12.0
+    A = b * h
+    
+    f1 = (22.3733 / (2 * np.pi * L**2)) * np.sqrt((E_pa * I) / (density_kg_m3 * A))
     return f1
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=str, default="data/raw_measurements.json", help="Path to raw measurements")
-    parser.add_argument("--output", type=str, default="data/ground_truth.csv", help="Output ground truth path")
-    args = parser.parse_args()
-    
-    if not os.path.exists(args.input):
-        print(f"error: input file {args.input} not found.")
-        print("please create it to process your physical measurements.")
-        # Create a dummy template for them
-        os.makedirs("data", exist_ok=True)
-        template = [
-            {
-                "sample_id": "PLA_100_infill",
-                "mass_kg": 0.019,
-                "length_m": 0.100,
-                "width_m": 0.020,
-                "thickness_m": 0.008,
-                "bend_span_m": 0.080,
-                "bend_forces_N": [0.0, 5.0, 10.0, 15.0],
-                "bend_deflections_m": [0.0, 0.0001, 0.0002, 0.0003]
-            }
-        ]
-        with open(args.input, "w") as f:
-            json.dump(template, f, indent=4)
-        print(f"i created a template for you at {args.input}. fill it with your real data!")
+def process_ground_truth(data_dir="data/raw_measurements"):
+    meta_path = os.path.join(data_dir, "sample_metadata.csv")
+    if not os.path.exists(meta_path):
+        print(f"Error: {meta_path} not found.")
         return
         
-    with open(args.input, "r") as f:
-        raw_data = json.load(f)
+    df_meta = pd.read_csv(meta_path)
+    
+    results = []
+    
+    for _, row in df_meta.iterrows():
+        sid = row['sample_id']
         
-    records = []
-    for item in raw_data:
-        rho = calculate_density(item["mass_kg"], item["length_m"], item["width_m"], item["thickness_m"])
-        
-        E, r2 = calculate_youngs_modulus(
-            item["bend_forces_N"], 
-            item["bend_deflections_m"], 
-            item["bend_span_m"], 
-            item["width_m"], 
-            item["thickness_m"]
+        # Calculate Density
+        rho, rho_err = calculate_density(
+            row['mass_g'], row['mass_err_g'],
+            row['length_mm'], row['length_err_mm'],
+            row['width_mm'], row['width_err_mm'],
+            row['thickness_mm'], row['thickness_err_mm']
         )
         
-        if r2 < 0.95:
-            print(f"warning: poor bend fit for {item['sample_id']} (r2={r2:.3f}). possible slipping?")
+        # Find bend data
+        bend_path = os.path.join(data_dir, f"bend_{sid}.csv")
+        if not os.path.exists(bend_path):
+            print(f"Warning: No bend data found for {sid}. Skipping Young's modulus.")
+            continue
             
-        f1_predicted = predict_first_bending_mode(E, rho, item["length_m"], item["width_m"], item["thickness_m"])
+        df_bend = pd.read_csv(bend_path)
+        E_pa, E_gpa, r2 = calculate_youngs_modulus(df_bend, row['width_mm'], row['thickness_mm'])
         
-        records.append({
-            "sample_id": item["sample_id"],
-            "density_kgm3": rho,
-            "youngs_modulus_pa": E,
-            "bend_r2": r2,
-            "predicted_mode_1_hz": f1_predicted
+        if r2 < 0.98:
+            print(f"WARNING: Poor linear fit for {sid} (R^2 = {r2:.4f}). Check for plastic deformation.")
+            
+        f1_pred = predict_first_bending_mode(E_pa, rho, row['length_mm'], row['width_mm'], row['thickness_mm'])
+        
+        results.append({
+            'sample_id': sid,
+            'density_kg_m3': round(rho, 2),
+            'density_err_kg_m3': round(rho_err, 2),
+            'youngs_modulus_gpa': round(E_gpa, 4),
+            'E_r_squared': round(r2, 4),
+            'predicted_f1_hz': round(f1_pred, 1)
         })
         
-    df = pd.DataFrame(records)
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    df.to_csv(args.output, index=False)
-    print(f"processed {len(records)} physical samples. saved to {args.output}")
+    df_results = pd.DataFrame(results)
+    
+    out_dir = "data"
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, "ground_truth.csv")
+    df_results.to_csv(out_path, index=False)
+    print(f"Successfully processed ground truth data and saved to {out_path}")
+    print(df_results)
 
 if __name__ == "__main__":
-    main()
+    process_ground_truth()

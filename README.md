@@ -4,6 +4,14 @@ This repository contains the software and firmware pipeline for characterizing m
 
 The system relies on a physical testing rig (an ESP32-controlled solenoid) to strike material samples. The resulting acoustic waveform is captured, processed using physics-based modal feature extraction (identifying resonant frequencies and damping coefficients), and passed through a machine learning classifier to predict the material's properties.
 
+## Scientific Objectives
+This project bridges the gap between robotic perception (which currently predicts categorical labels under controlled contact) and non-destructive testing (which predicts continuous physical properties using expensive lab apparatus). Our **headline objective** is to prove that a robot can predict continuous physical properties (Density and Young's Modulus) from acoustic impacts, robust to real-world variations in contact location and force.
+
+**Research Questions:**
+- **RQ1:** Can we perform accurate property regression (Density, Stiffness) under a leave-one-sample-out evaluation?
+- **RQ2:** How well does property estimation generalize across contact variation (held-out force levels and held-out strike positions)?
+- **RQ3:** Which acoustic feature families (modal vs. generic) are most resilient to contact variation?
+
 ## Getting Started
 
 This project uses `uv` for lightning-fast Python package management. 
