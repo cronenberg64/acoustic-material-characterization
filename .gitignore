@@ -1,4 +1,7 @@
+# macOS
+.DS_Store
 .DS_store
+
 # Virtual environments
 .venv/
 venv/
@@ -8,7 +11,7 @@ ENV/
 # Python cache
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 *.so
 .pytest_cache/
 
@@ -19,12 +22,17 @@ __pycache__/
 *.swo
 
 # Project specific data
-results/
-data/
-tmp/
+/results/
+/data/
+/tmp/
 *.wav
 
 # PlatformIO
 .pio/
 
+# External dataset & docs
 RealImpact
+*.pdf
+
+# Scratch / temporary build artifacts
+scratch/
