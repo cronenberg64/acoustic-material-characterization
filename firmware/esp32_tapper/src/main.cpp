@@ -33,7 +33,9 @@ void setup() {
   
   scale.begin(HX711_DOUT_PIN, HX711_SCK_PIN);
   scale.set_scale(calibration_factor);
-  scale.tare(); // Reset the scale to 0
+  if (scale.wait_ready_timeout(100)) {
+    scale.tare(); // Reset the scale to 0
+  }
   
   Serial.println("{\"status\": \"ready\"}");
 }
@@ -64,8 +66,11 @@ void process_command(String cmd) {
       else if (level == 2) pw = pw_level_2;
       else if (level == 3) pw = pw_level_3;
       
-      // Measure preload
-      float preload = scale.get_units(5);
+      // Measure preload if scale is connected
+      float preload = 0.0;
+      if (scale.wait_ready_timeout(50)) {
+        preload = scale.get_units(3);
+      }
       
       // Fire
       fire_solenoid(pw);
@@ -84,11 +89,21 @@ void process_command(String cmd) {
     doc["pw_set"] = current_pw;
   }
   else if (cmd.equals("TARE")) {
-    scale.tare();
-    doc["tared"] = true;
+    if (scale.wait_ready_timeout(100)) {
+      scale.tare();
+      doc["tared"] = true;
+    } else {
+      doc["tared"] = false;
+      doc["warning"] = "HX711 not ready";
+    }
   }
   else if (cmd.equals("READ_FORCE")) {
-    doc["force"] = scale.get_units(5);
+    if (scale.wait_ready_timeout(100)) {
+      doc["force"] = scale.get_units(5);
+    } else {
+      doc["force"] = 0.0;
+      doc["warning"] = "HX711 not ready";
+    }
   }
   else if (cmd.equals("STATUS")) {
     doc["ready"] = true;
