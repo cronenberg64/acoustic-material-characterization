@@ -22,8 +22,8 @@
 
 ## Phase 1: 3D Printing & Physical Rig Fabrication
 - [x] **Base Fixture & Bend Jig (Completed):**
-  - [x] `cad/base_plate.stl` (Printed & Ready ✓)
-  - [x] `cad/bend_jig.stl` (Printed & Ready ✓)
+  - [x] `cad/base_plate.stl` (old plate, retired; replaced by `cad/rig/structure/base_board.stl`)
+  - [x] `cad/specimens/bend_jig.stl` (Printed & Ready ✓)
   - [x] M3 brass heat-set inserts installed in base plate (All 12 holes flush ✓)
 - [ ] **Solenoid Carriage & Mount (Redesign Overhaul in Progress):**
   - [x] Retired legacy 2-piece design (32 mm legs starved screw threads, trapped nuts, blocked rear holes)
@@ -46,7 +46,7 @@
   - [ ] Check 2020 extrusion slot width (5 mm vs 6 mm) for T-nuts
   - [ ] Decide strike tip: steel ball glued into the cap vs printed dome
 - [ ] **Specimen Beams Print Status:**
-  - [x] PLA 100% bar printed (`cad/sample_100x20x8.stl` ✓)
+  - [x] PLA 100% bar printed (`cad/specimens/sample_100x20x8.stl` ✓)
   - [x] TPU 60% bar printed ✓
   - [ ] Print remaining PLA bars (80%, 60% ×3 as PLA-60 / -R1 / -R2, 40%, 20%)
   - [ ] Print TPU-100
