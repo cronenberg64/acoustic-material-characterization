@@ -23,7 +23,7 @@ The solenoid width uses the PROVISIONAL coil-bulge value (29.7 mm) until it is m
 | Deck lowered onto the tier 2 pins | OK | -0.00 |
 | Lid lowered onto the deck | OK | -0.00 |
 | Carriage lowered 12 mm until the pad meets the bar | OK | +0.30 |
-| Stand posts lowered into the base sockets | OK | -0.00 |
+| Stand posts lowered into the base sockets (snap: walls flex 0.14 mm on the way in, then click; seated overlap -0.00) | OK | -0.00 |
 | Stand beam lowered onto the posts | OK | -0.00 |
 | Bar hung under the beam (clear of posts and base) | OK | +inf |
 
@@ -42,6 +42,6 @@ The solenoid width uses the PROVISIONAL coil-bulge value (29.7 mm) until it is m
 | printed bar in the board channel | 0.50 | ~0.2 | fits |
 | bottom tile in the chamber | 0.80 | ~0.2 | fits |
 | post in its base socket | 0.30 | ~0.2 | fits |
-| beam in the post seat | 0.30 | ~0.2 | fits |
+| beam tongue in the post-top slot (press fit on purpose) | 0.20 | ~0.2 | snug press fit (as intended) |
 
 What this cannot predict: sagging, warping, stringing or layer shifts on your printer. It only checks that the geometry in the files fits and goes together.

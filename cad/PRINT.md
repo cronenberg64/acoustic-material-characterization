@@ -25,7 +25,7 @@ Exception: the ballast pockets under `base_board.stl` bridge 16 mm. They are hid
 | `structure/tier_2_spring_chamber.stl` | 1 | PLA | 4 | 25% | 5 | | 4–5 h | Blocked: coil-bulge measurement |
 | `electronics/tier_3_deck.stl` | 1 | PLA | 3 | 15% | 4 | | 3–4 h | Old (no lid screw bosses), Ready |
 | `electronics/tier_4_lid.stl` | 1 | Wood (friend) | – | – | – | 100 × 120 mm panel, 4 × Ø3.4 holes; 1:1 drilling template: `electronics/tier_4_lid_template.svg` (print at 100 %, check the 100 mm scale bar) | – | Old (hook lid broke), Ready for woodwork |
-| `solenoid_fit/filler_22_x2_TPU.stl` | 2 | TPU 95A | 4 | 15% | 4 | Hollow tube; ≤30 mm/s, direct feed, dry filament | ~1 h each | Old (solid, too tight), Ready |
+| `solenoid_fit/filler_22_x2_TPU.stl` | 2 | TPU 95A | 4 | 15% | 4 | Hollow, 2 pockets + grip fin on top (pinch it to pull the filler out); ≤30 mm/s, direct feed, dry filament | ~1 h each | Old (solid, too tight), Ready |
 | `solenoid_fit/filler_44_x1_TPU.stl` | 1 | TPU 95A | 4 | 15% | 4 | Same as above | ~1.5 h | Old, Ready |
 | `solenoid_fit/tile_bottom_x7.stl` | 7 | PLA | 4 | 100% | – | | minutes | 4 printed, 3 more to print |
 | `solenoid_fit/tile_top_x7.stl` | 7 | PLA | 4 | 100% | – | | minutes | 4 printed, 3 more to print |
@@ -46,16 +46,16 @@ Blocked parts need three numbers before printing: plunger axis to each side of t
 
 | File | Qty | Material | Walls | Infill (gyroid) | Top/bottom | Time | Status |
 |---|---|---|---|---|---|---|---|
-| `mic_post.stl` | 1 | PLA | 4 | 30% | 5 | 0.5–1 h | Sent to friend (2026-10-13) |
-| `mic_arm_holder.stl` | 1 | PLA | 4 | 40% | 5 | 0.5 h | Sent to friend (2026-10-13) |
+| `mic_post.stl` | 1 | PLA | 4 | 30% | 5 | 0.5–1 h | Old if printed from the 2026-10-13 file (base now reaches under the braces), Ready |
+| `mic_arm_holder.stl` | 1 | PLA | 4 | 40% | 5 | 0.5 h | Old if printed from the 2026-10-13 file (zip-tie slots moved), Ready |
 
 ## Suspension stand (`stand/`)
 
 | File | Qty | Material | Walls | Infill (gyroid) | Top/bottom | Time | Status |
 |---|---|---|---|---|---|---|---|
-| `stand_base.stl` | 1 | PLA | 4 | 30% | 5 | 3–4 h | Ready |
+| `stand_base.stl` | 1 | PLA | 4 | 30% | 5 | 3–4 h | Ready (posts click in, no screws) |
 | `stand_post_x2.stl` | 2 | PLA | 4 | 30% | 5 | ~1.5 h each (saved lying flat; print it that way) | Ready |
-| `stand_beam.stl` | 1 | PLA | 4 | 100% | 5 | 0.5–1 h | Sent to friend (2026-10-13), still current |
+| `stand_beam.stl` | 1 | PLA | 4 | 100% | 5 | 0.5–1 h | Old if printed from the 2026-10-13 file (ends are now tongues), Ready |
 
 ## Specimens and strikers
 
@@ -82,8 +82,7 @@ Skip these if not printed yet; the current versions are in the tables above:
 | Tier 2 → tier 1 (retainer) | 4 × M3×8 + 4 M3 nuts (pockets in tier 1 top) | Yes |
 | Lid → deck | 4 × M3×8 + 4 M3 nuts (pockets in deck corner bosses) | Yes |
 | Mic post → board | 2 × M3×12 + 2 M3 nuts (slide in the channels under the board); arm: 1 × M3×12 + nut | Yes |
-| Stand posts → base | 2 × M3×16 from below + 2 M3 nuts (slots near the post bottoms) | Yes |
-| Stand beam → posts | 2 × M3×16 + 2 M3 nuts; thread clamps: M3 screws + washers | Yes |
+| Stand | No screws: posts click into the base sockets, beam tongues press into the post tops. Thread clamps on the beam: M3 screws + washers | Yes |
 | Clamp frame → board | 4 × M4×10 + 4 M4 nuts | **No, buy** |
 | Load cell → carriage / hanger | 2 × M4×10, 2 × M4×20 + 2 M4 nuts | **No, buy** |
 | Clamp pusher | 1 × M4×25 + 1 M4 nut | **No, buy** |
