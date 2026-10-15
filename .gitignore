@@ -36,3 +36,5 @@ RealImpact
 
 # Scratch / temporary build artifacts
 scratch/
+/pictures
+/cad/src
